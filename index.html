@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Wedding Scanner</title>
 
@@ -10,207 +11,370 @@
 
 <style>
 
+*{
+  box-sizing:border-box;
+}
+
 body{
   margin:0;
-  background:#f5f5f5;
-  font-family:Arial;
+  font-family:Arial,sans-serif;
+  background:
+  linear-gradient(135deg,#0f172a,#111827,#1e293b);
+  color:white;
+  min-height:100vh;
   display:flex;
   justify-content:center;
   align-items:center;
-  height:100vh;
+  padding:20px;
 }
 
-.box{
-  width:350px;
-  background:white;
-  padding:30px;
-  border-radius:25px;
-  box-shadow:0 0 25px rgba(0,0,0,0.1);
+.container{
+  width:100%;
+  max-width:430px;
+}
+
+.card{
+  background:rgba(255,255,255,0.08);
+  backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:30px;
+  padding:25px;
+  box-shadow:0 20px 60px rgba(0,0,0,0.4);
+}
+
+.header{
   text-align:center;
+  margin-bottom:20px;
 }
 
-h1{
-  margin-bottom:25px;
+.logo{
+  font-size:55px;
+  margin-bottom:10px;
+}
+
+.title{
+  font-size:30px;
+  font-weight:bold;
+}
+
+.subtitle{
+  margin-top:8px;
+  color:#cbd5e1;
+  font-size:16px;
 }
 
 #reader{
-  width:100%;
-  border-radius:20px;
   overflow:hidden;
+  border-radius:25px;
+  border:3px solid rgba(255,255,255,0.1);
 }
 
-.result{
-  margin-top:20px;
-  padding:20px;
-  border-radius:20px;
-  font-size:24px;
-  font-weight:bold;
+.scan-status{
+  margin-top:18px;
+  text-align:center;
+  color:#cbd5e1;
+  font-size:16px;
+}
+
+.result-overlay{
+  position:fixed;
+  inset:0;
   display:none;
-  line-height:1.8;
+  justify-content:center;
+  align-items:center;
+  z-index:999;
+  padding:20px;
 }
 
-.success{
-  background:#e7ffe7;
-  color:green;
+.result-card{
+  width:100%;
+  max-width:420px;
+  border-radius:35px;
+  padding:35px 25px;
+  text-align:center;
+  color:white;
+  animation:pop .2s ease;
+  box-shadow:0 20px 60px rgba(0,0,0,0.45);
 }
 
-.error{
-  background:#ffe7e7;
-  color:red;
+@keyframes pop{
+  from{
+    transform:scale(.9);
+    opacity:0;
+  }
+  to{
+    transform:scale(1);
+    opacity:1;
+  }
 }
 
-.info{
-  margin-top:15px;
-  color:#666;
-  font-size:18px;
+.success-bg{
+  background:linear-gradient(135deg,#16a34a,#22c55e);
+}
+
+.error-bg{
+  background:linear-gradient(135deg,#dc2626,#ef4444);
+}
+
+.loading-bg{
+  background:linear-gradient(135deg,#334155,#475569);
+}
+
+.icon{
+  font-size:90px;
+  margin-bottom:15px;
+}
+
+.main-text{
+  font-size:32px;
+  font-weight:bold;
+  margin-bottom:20px;
+}
+
+.info-box{
+  background:rgba(255,255,255,0.14);
+  border-radius:20px;
+  padding:18px;
+  margin-top:12px;
+}
+
+.label{
+  font-size:15px;
+  opacity:.9;
+}
+
+.value{
+  font-size:26px;
+  font-weight:bold;
+  margin-top:5px;
+}
+
+.footer{
+  text-align:center;
+  margin-top:20px;
+  color:#94a3b8;
+  font-size:14px;
 }
 
 </style>
+
 </head>
 
 <body>
 
-<div class="box">
+<div class="container">
 
-<h1>📷 مسح الدعوات</h1>
+  <div class="card">
 
-<div id="reader"></div>
+    <div class="header">
 
-<div class="info">
-وجّه الكاميرا على QR
+      <div class="logo">💍</div>
+
+      <div class="title">
+        Wedding Scanner
+      </div>
+
+      <div class="subtitle">
+        امسح الدعوة للتحقق
+      </div>
+
+    </div>
+
+    <div id="reader"></div>
+
+    <div class="scan-status">
+      📷 الكاميرا الخلفية تعمل
+    </div>
+
+  </div>
+
+  <div class="footer">
+    QR Invitation Verification
+  </div>
+
 </div>
 
-<div id="result" class="result"></div>
+<div class="result-overlay" id="overlay">
+
+  <div class="result-card loading-bg" id="resultCard">
+
+    <div class="icon" id="icon">
+      ⏳
+    </div>
+
+    <div class="main-text" id="mainText">
+      جاري التحقق...
+    </div>
+
+    <div class="info-box">
+
+      <div class="label">
+        رقم الدعوة
+      </div>
+
+      <div class="value" id="inviteCode">
+        ...
+      </div>
+
+    </div>
+
+    <div class="info-box">
+
+      <div class="label">
+        حالة الدعوة
+      </div>
+
+      <div class="value" id="inviteStatus">
+        ...
+      </div>
+
+    </div>
+
+  </div>
 
 </div>
 
 <script>
 
-const resultDiv = document.getElementById("result");
+const API_URL =
+"https://script.google.com/macros/s/AKfycbw_GCFnvSDJz_p5qIXwJzFiexETdYtIPqY017EFhDrxKmdoXBzzbNVhms-K09tDr7l-/exec";
 
-// أصوات
+const overlay = document.getElementById("overlay");
+const resultCard = document.getElementById("resultCard");
+const icon = document.getElementById("icon");
+const mainText = document.getElementById("mainText");
+const inviteCode = document.getElementById("inviteCode");
+const inviteStatus = document.getElementById("inviteStatus");
+
 const successSound = new Audio("https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3");
 const errorSound = new Audio("https://assets.mixkit.co/active_storage/sfx/2955/2955-preview.mp3");
 
-function onScanSuccess(decodedText) {
+let processing = false;
+
+async function onScanSuccess(decodedText){
+
+  if(processing) return;
+
+  processing = true;
 
   html5QrCode.pause();
 
-  // استخراج الكود
-  const url = new URL(decodedText);
-  const code = url.searchParams.get("code");
+  // الآن QR يحتوي فقط الكود
+  const code = decodedText.trim();
 
-  // شاشة الانتظار
-  resultDiv.style.display = "block";
-  resultDiv.className = "result";
-  resultDiv.innerHTML = `
-    ⏳
-    <br><br>
-    جاري التحقق...
-    <br><br>
-    ${code}
-  `;
+  overlay.style.display = "flex";
 
-  fetch(decodedText)
-    .then(res => res.text())
-    .then(data => {
+  resultCard.className = "result-card loading-bg";
 
-      // صالح
-      if(data.includes("صالحة")){
+  icon.innerHTML = "⏳";
 
-        successSound.play();
+  mainText.innerHTML = "جاري التحقق...";
 
-        resultDiv.className = "result success";
+  inviteCode.innerHTML = code;
 
-        resultDiv.innerHTML = `
-          ✅
-          <br><br>
-          الدعوة صالحة
-          <br><br>
+  inviteStatus.innerHTML = "انتظر";
 
-          رقم الدعوة:
-          <br>
-          <b>${code}</b>
+  try{
 
-          <br><br>
+    const response = await fetch(
+      API_URL + "?code=" + code
+    );
 
-          حالة الدعوة:
-          <br>
-          صالحة
-        `;
+    const data = await response.text();
 
-      }
+    // صالح
+    if(data.includes("OK")){
 
-      // مستخدمة
-      else if(data.includes("مستخدمة")){
+      navigator.vibrate?.(150);
 
-        errorSound.play();
+      successSound.play();
 
-        resultDiv.className = "result error";
+      resultCard.className = "result-card success-bg";
 
-        resultDiv.innerHTML = `
-          ❌
-          <br><br>
-          مستخدمة مسبقًا
-          <br><br>
+      icon.innerHTML = "✅";
 
-          رقم الدعوة:
-          <br>
-          <b>${code}</b>
+      mainText.innerHTML = "الدعوة صالحة";
 
-          <br><br>
+      inviteStatus.innerHTML = "صالحة";
 
-          حالة الدعوة:
-          <br>
-          مستخدمة
-        `;
+    }
 
-      }
+    // مستخدمة
+    else if(data.includes("USED")){
 
-      // خطأ
-      else{
+      navigator.vibrate?.([120,80,120]);
 
-        errorSound.play();
+      errorSound.play();
 
-        resultDiv.className = "result error";
+      resultCard.className = "result-card error-bg";
 
-        resultDiv.innerHTML = `
-          ⚠️
-          <br><br>
-          خطأ في التحقق
-        `;
+      icon.innerHTML = "❌";
 
-      }
+      mainText.innerHTML = "مستخدمة مسبقًا";
 
-      // يرجع للمسح
-      setTimeout(() => {
+      inviteStatus.innerHTML = "مستخدمة";
 
-        resultDiv.style.display = "none";
+    }
 
-        html5QrCode.resume();
+    // غير موجودة
+    else{
 
-      }, 3500);
+      navigator.vibrate?.([120,80,120]);
 
-    });
+      errorSound.play();
+
+      resultCard.className = "result-card error-bg";
+
+      icon.innerHTML = "⚠️";
+
+      mainText.innerHTML = "دعوة غير موجودة";
+
+      inviteStatus.innerHTML = "خطأ";
+
+    }
+
+  }catch(err){
+
+    errorSound.play();
+
+    resultCard.className = "result-card error-bg";
+
+    icon.innerHTML = "⚠️";
+
+    mainText.innerHTML = "خطأ بالاتصال";
+
+    inviteStatus.innerHTML = "تعذر التحقق";
+
+  }
+
+  setTimeout(()=>{
+
+    overlay.style.display = "none";
+
+    html5QrCode.resume();
+
+    processing = false;
+
+  },1800);
 
 }
 
 const html5QrCode = new Html5Qrcode("reader");
 
-Html5Qrcode.getCameras().then(devices => {
+Html5Qrcode.getCameras().then(devices=>{
 
-  if (devices && devices.length) {
+  if(devices && devices.length){
 
     const backCamera =
       devices.find(d =>
-        d.label.toLowerCase().includes('back')
+        d.label.toLowerCase().includes("back")
       )?.id || devices[0].id;
 
     html5QrCode.start(
       backCamera,
       {
-        fps: 10,
-        qrbox: 250
+        fps:30,
+        qrbox:{width:180,height:180}
       },
       onScanSuccess
     );
