@@ -42,10 +42,11 @@ h1{
 .result{
   margin-top:20px;
   padding:20px;
-  border-radius:18px;
-  font-size:22px;
+  border-radius:20px;
+  font-size:24px;
   font-weight:bold;
   display:none;
+  line-height:1.8;
 }
 
 .success{
@@ -61,6 +62,7 @@ h1{
 .info{
   margin-top:15px;
   color:#666;
+  font-size:18px;
 }
 
 </style>
@@ -86,40 +88,108 @@ h1{
 
 const resultDiv = document.getElementById("result");
 
+// أصوات
+const successSound = new Audio("https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3");
+const errorSound = new Audio("https://assets.mixkit.co/active_storage/sfx/2955/2955-preview.mp3");
+
 function onScanSuccess(decodedText) {
 
   html5QrCode.pause();
+
+  // استخراج الكود
+  const url = new URL(decodedText);
+  const code = url.searchParams.get("code");
+
+  // شاشة الانتظار
+  resultDiv.style.display = "block";
+  resultDiv.className = "result";
+  resultDiv.innerHTML = `
+    ⏳
+    <br><br>
+    جاري التحقق...
+    <br><br>
+    ${code}
+  `;
 
   fetch(decodedText)
     .then(res => res.text())
     .then(data => {
 
-      resultDiv.style.display = "block";
-
+      // صالح
       if(data.includes("صالحة")){
 
+        successSound.play();
+
         resultDiv.className = "result success";
-        resultDiv.innerHTML = "✅ الدعوة صالحة";
 
-      } else if(data.includes("مستخدمة")) {
+        resultDiv.innerHTML = `
+          ✅
+          <br><br>
+          الدعوة صالحة
+          <br><br>
 
-        resultDiv.className = "result error";
-        resultDiv.innerHTML = "❌ مستخدمة مسبقًا";
+          رقم الدعوة:
+          <br>
+          <b>${code}</b>
 
-      } else {
+          <br><br>
 
-        resultDiv.className = "result error";
-        resultDiv.innerHTML = "⚠️ خطأ في التحقق";
+          حالة الدعوة:
+          <br>
+          صالحة
+        `;
 
       }
 
+      // مستخدمة
+      else if(data.includes("مستخدمة")){
+
+        errorSound.play();
+
+        resultDiv.className = "result error";
+
+        resultDiv.innerHTML = `
+          ❌
+          <br><br>
+          مستخدمة مسبقًا
+          <br><br>
+
+          رقم الدعوة:
+          <br>
+          <b>${code}</b>
+
+          <br><br>
+
+          حالة الدعوة:
+          <br>
+          مستخدمة
+        `;
+
+      }
+
+      // خطأ
+      else{
+
+        errorSound.play();
+
+        resultDiv.className = "result error";
+
+        resultDiv.innerHTML = `
+          ⚠️
+          <br><br>
+          خطأ في التحقق
+        `;
+
+      }
+
+      // يرجع للمسح
       setTimeout(() => {
 
         resultDiv.style.display = "none";
 
         html5QrCode.resume();
 
-      }, 3000);
+      }, 3500);
 
     });
 
